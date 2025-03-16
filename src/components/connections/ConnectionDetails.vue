@@ -15,8 +15,14 @@
         <template v-if="details">
           {{ $t('connectionIP') }} {{ details?.ip }} ( AS{{ details?.asn }} )
           <div class="flex gap-3">
-            {{ details?.country }}
-            {{ details?.asn_organization }}
+            <div class="flex items-center gap-1">
+              <MapPinIcon class="h-4 w-4 shrink-0" />
+              {{ details?.country }}
+            </div>
+            <div class="flex items-center gap-1">
+              <ServerIcon class="h-4 w-4 shrink-0" />
+              {{ details?.organization }}
+            </div>
           </div>
         </template>
       </div>
@@ -28,6 +34,7 @@
 import { getIPFromIpsbAPI, type GlobalIPType } from '@/api'
 import DialogWrapper from '@/components/common/DialogWrapper.vue'
 import { useConnections } from '@/composables/connections'
+import { MapPinIcon, ServerIcon } from '@heroicons/vue/24/outline'
 import { computed, ref, watch } from 'vue'
 import VueJsonPretty from 'vue-json-pretty'
 import 'vue-json-pretty/lib/styles.css'
