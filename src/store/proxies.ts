@@ -73,12 +73,26 @@ export const fetchProxies = async () => {
   const { data: proxyData } = await fetchProxiesAPI()
   const { data: providerData } = await fetchProxyProviderAPI()
   const sortIndex = proxyData.proxies[GLOBAL].all ?? []
+  const allProviderProxies: Record<string, Proxy> = {}
+  const providers = Object.values(providerData.providers).filter(
+    (provider) => provider.name !== 'default' && provider.vehicleType !== 'Compatible',
+  )
 
-  proxyMap.value = proxyData.proxies
+  for (const provider of providers) {
+    for (const proxy of provider.proxies) {
+      allProviderProxies[proxy.name] = proxy
+    }
+  }
+
+  proxyMap.value = {
+    ...allProviderProxies,
+    ...proxyData.proxies,
+  }
   proxyGroupList.value = Object.values(proxyData.proxies)
     .filter((proxy) => proxy.all?.length && proxy.name !== GLOBAL)
     .sort((prev, next) => sortIndex.indexOf(prev.name) - sortIndex.indexOf(next.name))
     .map((proxy) => proxy.name)
+  proxyProviederList.value = providers
 
   Object.entries(proxyData.proxies).map(([name, proxy]) => {
     if (IPv6test.value && getIPv6FromExtra(proxy)) {
@@ -88,9 +102,6 @@ export const fetchProxies = async () => {
       hiddenGroupMap.value[name] = true
     }
   })
-  proxyProviederList.value = Object.values(providerData.providers).filter(
-    (provider) => provider.name !== 'default' && provider.vehicleType !== 'Compatible',
-  )
 }
 
 export const selectProxy = async (proxyGroup: string, name: string) => {
